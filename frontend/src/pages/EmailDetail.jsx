@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import AppLayout from '../components/layout/AppLayout';
 import { EmailDetailSkeleton } from '../components/common/Skeleton';
 import ComposeModal from '../components/compose/ComposeModal';
+import ThreadView from '../components/mail/ThreadView';
 import { useMail } from '../hooks/useMail';
 import { useAuth } from '../hooks/useAuth';
 import { sanitizeHtml } from '../utils/sanitize';
@@ -47,6 +48,27 @@ export default function EmailDetail() {
         message_id: selectedEmail.headers?.message_id,
         thread_id: selectedEmail.thread_id,
         subject: selectedEmail.subject
+      }
+    );
+  };
+
+  const handleThreadMessageReply = (msg) => {
+    if (!msg) return;
+    const recipient = msg.from?.email || msg.from?.raw;
+    const origSubj = msg.subject || selectedEmail?.subject || '';
+    const replySubject = origSubj.toLowerCase().startsWith('re:') ? origSubj : `Re: ${origSubj}`;
+
+    openCompose(
+      {
+        to: recipient,
+        subject: replySubject,
+        body: `\n\n--- On ${msg.date}, ${msg.from?.name || recipient} wrote: ---\n${msg.body_plain || ''}`
+      },
+      false,
+      {
+        message_id: msg.headers?.message_id,
+        thread_id: msg.thread_id || selectedEmail?.thread_id,
+        subject: msg.subject || selectedEmail?.subject
       }
     );
   };
@@ -173,6 +195,15 @@ export default function EmailDetail() {
                   ))}
                 </div>
               </div>
+            )}
+
+            {/* Conversation Thread View */}
+            {selectedEmail.thread_id && (
+              <ThreadView
+                threadId={selectedEmail.thread_id}
+                currentMessageId={selectedEmail.id}
+                onReply={handleThreadMessageReply}
+              />
             )}
           </article>
         ) : null}
