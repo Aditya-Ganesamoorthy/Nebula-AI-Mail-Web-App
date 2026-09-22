@@ -21,7 +21,52 @@ def _get_session_id(request: Request, session_id: Optional[str] = None) -> Optio
     auth_hdr = request.headers.get("Authorization")
     if auth_hdr and auth_hdr.startswith("Bearer "):
         return auth_hdr.split(" ")[1]
-    return request.cookies.get("nebula_mail_session")
+@router.get("/search")
+async def search_emails(
+    request: Request,
+    sender: Optional[str] = Query(None),
+    keyword: Optional[str] = Query(None),
+    date_preset: Optional[str] = Query(None),
+    date_from: Optional[str] = Query(None),
+    date_to: Optional[str] = Query(None),
+    unread: Optional[bool] = Query(None),
+    page_token: Optional[str] = Query(None),
+    max_results: int = Query(25, ge=1, le=50),
+    session_id: Optional[str] = Query(None)
+):
+    """Search messages using structured filters translated to safe Gmail queries."""
+    from app.services.search_service import search_service
+    sid = _get_session_id(request, session_id)
+    gmail_query = search_service.build_gmail_query(
+        sender=sender,
+        keyword=keyword,
+        date_preset=date_preset,
+        date_from=date_from,
+        date_to=date_to,
+        unread=unread
+    )
+    try:
+        data = await gmail_service.list_inbox(
+            session_id=sid,
+            query=gmail_query,
+            page_token=page_token,
+            max_results=max_results
+        )
+        return {
+            "success": True,
+            "data": {
+                **data,
+                "constructed_query": gmail_query
+            },
+            "error": None
+        }
+    except Exception as e:
+        logger.error(f"Error executing search: {str(e)}", exc_info=True)
+        return {
+            "success": False,
+            "data": None,
+            "error": {"code": "SEARCH_ERROR", "message": "Failed to search emails."}
+        }
 
 @router.get("/inbox")
 async def get_inbox(
