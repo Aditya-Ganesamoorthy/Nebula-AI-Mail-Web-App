@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, Sparkles, Menu, ShieldCheck, Mail, LogOut, RefreshCw, X } from 'lucide-react';
+import SyncStatusBadge from './SyncStatusBadge';
 
 export default function Header({
   searchQuery,
@@ -11,7 +12,10 @@ export default function Header({
   isAssistantOpen,
   onToggleAssistant,
   onToggleMobileSidebar,
-  isSyncing = false
+  isSyncing = false,
+  realtimeStatus = 'disconnected',
+  lastSyncTime = null,
+  onReconnect
 }) {
   return (
     <header className="h-16 bg-white border-b border-stone-200 px-4 md:px-6 flex items-center justify-between gap-4 sticky top-0 z-20">
@@ -63,10 +67,11 @@ export default function Header({
       {/* Right: Sync Status, Account & AI Toggle */}
       <div className="flex items-center gap-2.5 sm:gap-3">
         {/* Real-time sync indicator */}
-        <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-          <span className={`w-2 h-2 rounded-full ${isSyncing ? 'bg-amber-500 animate-spin' : 'bg-emerald-500'}`} />
-          <span>{isSyncing ? 'Syncing...' : 'Live Sync'}</span>
-        </div>
+        <SyncStatusBadge
+          status={realtimeStatus}
+          lastSyncTime={lastSyncTime}
+          onReconnect={onReconnect}
+        />
 
         {/* Account Pill */}
         {connectedAccount ? (

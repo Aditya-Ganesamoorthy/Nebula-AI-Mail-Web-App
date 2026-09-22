@@ -3,6 +3,7 @@ import Header from './Header';
 import Sidebar from './Sidebar';
 import AssistantPanel from '../assistant/AssistantPanel';
 import { useAssistant } from '../../hooks/useAssistant';
+import { useMail } from '../../context/MailContext';
 
 export default function AppLayout({
   children,
@@ -21,6 +22,7 @@ export default function AppLayout({
 }) {
   const [isAssistantOpen, setIsAssistantOpen] = useState(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const { realtimeStatus, lastSyncTime, forceReconnect } = useMail();
 
   const {
     messages,
@@ -56,6 +58,9 @@ export default function AppLayout({
         onToggleAssistant={() => setIsAssistantOpen(!isAssistantOpen)}
         onToggleMobileSidebar={() => setIsMobileSidebarOpen(true)}
         isSyncing={isSyncing}
+        realtimeStatus={realtimeStatus}
+        lastSyncTime={lastSyncTime}
+        onReconnect={forceReconnect}
       />
 
       {/* Main Workspace Grid */}
