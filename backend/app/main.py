@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 
 from app.core.config import settings
 from app.core.logging import setup_logging, logger
-from app.routes import health
+from app.routes import health, auth
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -49,3 +49,4 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 # Include Routers
 app.include_router(health.router)
+app.include_router(auth.router)
