@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import AppLayout from '../components/layout/AppLayout';
 import EmailList from '../components/mail/EmailList';
+import FilterBar from '../components/filters/FilterBar';
 import ComposeModal from '../components/compose/ComposeModal';
 import { useMail } from '../hooks/useMail';
 import { useAuth } from '../hooks/useAuth';
@@ -12,6 +13,8 @@ export default function Inbox() {
     loading,
     error,
     refresh,
+    filters,
+    setFilters,
     clearFilters,
     isFiltered,
     composeState,
@@ -26,6 +29,20 @@ export default function Inbox() {
   const handleSearchSubmit = (e) => {
     if (e) e.preventDefault();
     fetchInbox(searchQuery);
+  };
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    // Build query from new filters and fetch
+    const parts = [];
+    if (newFilters.unreadOnly) parts.push('is:unread');
+    if (newFilters.sender) parts.push(`from:${newFilters.sender}`);
+    if (newFilters.keyword) parts.push(newFilters.keyword);
+    if (newFilters.datePreset) {
+      // Handled via backend date calculation or search endpoint
+      parts.push(`date_preset:${newFilters.datePreset}`);
+    }
+    fetchInbox();
   };
 
   const unreadCount = inboxMessages.filter((m) => m.is_unread).length;
@@ -45,7 +62,7 @@ export default function Inbox() {
     >
       <div className="flex flex-col h-full">
         {/* Inbox Subheader */}
-        <div className="px-6 py-4 border-b border-stone-200 bg-white flex items-center justify-between">
+        <div className="px-6 py-3.5 border-b border-stone-200 bg-white flex items-center justify-between">
           <div>
             <h1 className="text-base font-bold text-slate-800 tracking-tight">Inbox</h1>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -53,6 +70,14 @@ export default function Inbox() {
             </p>
           </div>
         </div>
+
+        {/* Filter Bar Controls */}
+        <FilterBar
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onClearFilters={clearFilters}
+          isFiltered={isFiltered}
+        />
 
         {/* Email List */}
         <div className="flex-1 overflow-hidden">
