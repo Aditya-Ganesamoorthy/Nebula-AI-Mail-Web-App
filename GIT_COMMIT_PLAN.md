@@ -1,7 +1,7 @@
 # NEBULA AI MAIL - GIT COMMIT PROGRESSION PLAN
 
 **Project**: Nebula AI Mail Web Application  
-**Author**: Aditya-Ganesamoorthy <Adityaganesamoorthy29122@gmail.com>  
+**Author**: Aditya-Ganesamoorthy <adityaganesamoorthy2912@gmail.com>  
 **Target Range**: 45–60 Meaningful Commits  
 **Convention**: Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`, `test:`, `security:`, `refactor:`)  
 **Strict Rule**: No fake commits, no AI co-author tags, verified user identity.  

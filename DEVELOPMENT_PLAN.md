@@ -1,7 +1,7 @@
 # NEBULA AI MAIL - DEVELOPMENT PLAN
 
 **Project**: Nebula AI Mail Web Application  
-**Author**: Aditya-Ganesamoorthy <Adityaganesamoorthy29122@gmail.com>  
+**Author**: Aditya-Ganesamoorthy <adityaganesamoorthy2912@gmail.com>  
 **Version**: 1.0.0  
 **Approach**: Incremental, test-driven, atomic-commit methodology  
 

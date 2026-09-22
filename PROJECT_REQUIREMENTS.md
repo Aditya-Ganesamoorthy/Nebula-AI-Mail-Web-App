@@ -4,7 +4,7 @@
 **Role**: Senior Full-Stack + AI + UI/UX + QA + Security Engineer  
 **Specification**: Nebula KnowLab Engineering Hiring Task (`Nebula_Mail_Web_App_Hiring_Task.pdf` + Prompt Specification)  
 **Repository**: `https://github.com/Aditya-Ganesamoorthy/Nebula-AI-Mail-Web-App.git`  
-**Git Author**: Aditya-Ganesamoorthy <Adityaganesamoorthy29122@gmail.com>
+**Git Author**: Aditya-Ganesamoorthy <adityaganesamoorthy2912@gmail.com>
 
 ---
 
