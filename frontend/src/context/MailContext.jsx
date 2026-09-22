@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { mailService } from '../services/mail';
 import { useAuth } from './AuthContext';
+import { useRealtime } from '../hooks/useRealtime';
 
 const MailContext = createContext(null);
 
 export function MailProvider({ children }) {
-  const { isConnected } = useAuth();
+  const { isConnected, user } = useAuth();
 
   const [inboxMessages, setInboxMessages] = useState([]);
   const [sentMessages, setSentMessages] = useState([]);
@@ -143,6 +144,29 @@ export function MailProvider({ children }) {
     }
   }, [isConnected, activeFolder]);
 
+  // Real-Time Pub/Sub & WebSocket Synchronization
+  const handleRealtimeInboxUpdate = useCallback(
+    (delta) => {
+      console.info('Real-time push received via WebSocket from Pub/Sub:', delta);
+      if (activeFolder === 'inbox') {
+        fetchInbox();
+      }
+    },
+    [activeFolder, fetchInbox]
+  );
+
+  const {
+    status: realtimeStatus,
+    lastSyncTime,
+    lastDelta,
+    forceReconnect,
+    isConnected: isLiveSyncConnected,
+  } = useRealtime({
+    userEmail: user?.email,
+    onInboxUpdated: handleRealtimeInboxUpdate,
+    enabled: isConnected && !!user?.email,
+  });
+
   // Open Compose Modal
   const openCompose = (data = {}, isAi = false, replyContext = null) => {
     setComposeState({
@@ -204,6 +228,11 @@ export function MailProvider({ children }) {
         openCompose,
         closeCompose,
         nextPageToken,
+        realtimeStatus,
+        lastSyncTime,
+        lastDelta,
+        forceReconnect,
+        isLiveSyncConnected,
       }}
     >
       {children}
