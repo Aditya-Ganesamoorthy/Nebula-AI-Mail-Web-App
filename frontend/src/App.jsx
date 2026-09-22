@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { MailProvider } from './context/MailContext';
+import { AssistantProvider } from './context/AssistantContext';
 import Inbox from './pages/Inbox';
 import Sent from './pages/Sent';
 import EmailDetail from './pages/EmailDetail';
@@ -13,15 +14,17 @@ export default function App() {
     <AuthProvider>
       <MailProvider>
         <BrowserRouter>
-          <Routes>
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/inbox" element={<Inbox />} />
-            <Route path="/sent" element={<Sent />} />
-            <Route path="/email/:id" element={<EmailDetail />} />
-            <Route path="/compose" element={<Compose />} />
-            <Route path="/" element={<Navigate to="/inbox" replace />} />
-            <Route path="*" element={<Navigate to="/inbox" replace />} />
-          </Routes>
+          <AssistantProvider>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/inbox" element={<Inbox />} />
+              <Route path="/sent" element={<Sent />} />
+              <Route path="/email/:id" element={<EmailDetail />} />
+              <Route path="/compose" element={<Compose />} />
+              <Route path="/" element={<Navigate to="/inbox" replace />} />
+              <Route path="*" element={<Navigate to="/inbox" replace />} />
+            </Routes>
+          </AssistantProvider>
         </BrowserRouter>
       </MailProvider>
     </AuthProvider>

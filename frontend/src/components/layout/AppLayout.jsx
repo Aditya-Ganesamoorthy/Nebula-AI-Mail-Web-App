@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import AssistantPanel from '../assistant/AssistantPanel';
+import { useAssistant } from '../../hooks/useAssistant';
 
 export default function AppLayout({
   children,
@@ -19,6 +21,26 @@ export default function AppLayout({
 }) {
   const [isAssistantOpen, setIsAssistantOpen] = useState(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  const {
+    messages,
+    isProcessing,
+    sendCommand,
+    confirmSend,
+    cancelSend,
+    pendingConfirmation
+  } = useAssistant();
+
+  const defaultAssistant = (
+    <AssistantPanel
+      messages={messages}
+      isProcessing={isProcessing}
+      onSendCommand={sendCommand}
+      onConfirmSend={confirmSend}
+      onCancelSend={cancelSend}
+      pendingConfirmation={pendingConfirmation}
+    />
+  );
 
   return (
     <div className="min-h-screen bg-[#fbfbf9] text-slate-800 flex flex-col font-sans">
@@ -56,11 +78,7 @@ export default function AppLayout({
         {/* Right AI Assistant Panel */}
         {isAssistantOpen && (
           <aside className="w-80 lg:w-96 xl:w-[400px] shrink-0 border-l border-stone-200 bg-stone-50/70 hidden md:flex flex-col h-[calc(100vh-4rem)] sticky top-16">
-            {assistantComponent || (
-              <div className="p-4 text-center text-sm text-slate-400">
-                AI Assistant
-              </div>
-            )}
+            {assistantComponent || defaultAssistant}
           </aside>
         )}
       </div>
@@ -80,7 +98,7 @@ export default function AppLayout({
               </button>
             </div>
             <div className="flex-1 overflow-y-auto">
-              {assistantComponent}
+              {assistantComponent || defaultAssistant}
             </div>
           </div>
         </div>
