@@ -23,11 +23,11 @@ class SearchService:
             date_to = today_start.strftime("%Y/%m/%d")
             return {"date_from": date_from, "date_to": date_to}
 
-        elif preset_lower in ("last_7_days", "7_days", "7d"):
+        elif preset_lower in ("last_7_days", "last_7d", "7_days", "7d"):
             date_from = (today_start - timedelta(days=7)).strftime("%Y/%m/%d")
             return {"date_from": date_from, "date_to": None}
 
-        elif preset_lower in ("last_10_days", "10_days", "10d"):
+        elif preset_lower in ("last_10_days", "last_10d", "10_days", "10d"):
             date_from = (today_start - timedelta(days=10)).strftime("%Y/%m/%d")
             return {"date_from": date_from, "date_to": None}
 
