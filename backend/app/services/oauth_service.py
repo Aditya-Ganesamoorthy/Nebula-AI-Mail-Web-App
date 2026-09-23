@@ -1,12 +1,13 @@
+import os
 import urllib.parse
 import httpx
 from typing import Dict, Any, Optional
-from google_auth_oauthlib.flow import Flow
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
 
 from app.core.config import settings
 from app.core.logging import logger
+
+# Allow local HTTP OAuth callback in development
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 # Essential Gmail and profile scopes (least privilege)
 GMAIL_SCOPES = [
@@ -17,10 +18,17 @@ GMAIL_SCOPES = [
 ]
 
 class OAuthService:
-    def __init__(self):
-        self.client_id = settings.GOOGLE_CLIENT_ID
-        self.client_secret = settings.GOOGLE_CLIENT_SECRET
-        self.redirect_uri = settings.GOOGLE_REDIRECT_URI
+    @property
+    def client_id(self) -> str:
+        return settings.GOOGLE_CLIENT_ID
+
+    @property
+    def client_secret(self) -> str:
+        return settings.GOOGLE_CLIENT_SECRET
+
+    @property
+    def redirect_uri(self) -> str:
+        return settings.GOOGLE_REDIRECT_URI
 
     def is_configured(self) -> bool:
         """Verify whether Google OAuth credentials are provided."""
@@ -30,44 +38,19 @@ class OAuthService:
         """
         Generate Google OAuth 2.0 authorization URL with CSRF state and explicit account selection.
         prompt='select_account' ensures the user explicitly picks their desired separate mail account.
+        Uses standard server-side web application flow matching client_secret token exchange.
         """
-        if not self.is_configured():
-            logger.warning("Google OAuth credentials missing. Generating demo authorization URL.")
-            params = {
-                "client_id": self.client_id or "demo-client-id",
-                "redirect_uri": self.redirect_uri,
-                "response_type": "code",
-                "scope": " ".join(GMAIL_SCOPES),
-                "state": state,
-                "access_type": "offline",
-                "prompt": "select_account",
-                "include_granted_scopes": "true",
-            }
-            return f"https://accounts.google.com/o/oauth2/v2/auth?{urllib.parse.urlencode(params)}"
-
-        client_config = {
-            "web": {
-                "client_id": self.client_id,
-                "client_secret": self.client_secret,
-                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/token",
-                "redirect_uris": [self.redirect_uri],
-            }
+        params = {
+            "client_id": self.client_id or "demo-client-id",
+            "redirect_uri": self.redirect_uri,
+            "response_type": "code",
+            "scope": " ".join(GMAIL_SCOPES),
+            "state": state,
+            "access_type": "offline",
+            "prompt": "select_account",
+            "include_granted_scopes": "true",
         }
-
-        flow = Flow.from_client_config(
-            client_config=client_config,
-            scopes=GMAIL_SCOPES,
-            redirect_uri=self.redirect_uri
-        )
-
-        auth_url, _ = flow.authorization_url(
-            access_type="offline",
-            prompt="select_account",
-            include_granted_scopes="true",
-            state=state
-        )
-        return auth_url
+        return f"https://accounts.google.com/o/oauth2/v2/auth?{urllib.parse.urlencode(params)}"
 
     async def exchange_code_for_tokens(self, code: str) -> Dict[str, Any]:
         """
