@@ -131,7 +131,7 @@ cd Nebula-AI-Mail-Web-App
 2. Enable the **Gmail API** under **APIs & Services > Library**.
 3. Configure the **OAuth Consent Screen**:
    - User Type: **External**
-   - Add Test User: `adityaganesamoorthy2912@gmail.com`
+   - Add Test User: `aditya.nebula.io@gmail.com`
    - Scopes:
      - `https://www.googleapis.com/auth/gmail.readonly`
      - `https://www.googleapis.com/auth/gmail.send`
